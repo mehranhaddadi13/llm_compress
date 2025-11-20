@@ -1,0 +1,35 @@
+This directory contains source for encoding/decoding applications.
+
+encode/decode
+	Source for dynamic PPMD compressor (i.e. based on characters)
+
+encode1/decode1
+	Source for static PPMD compressor 
+
+encode_word/decode_word
+	Source for dynamic PPMD compressor for words which uses four
+	models - word, nonword, char, nonchar
+
+encode_word1/decode_word1
+	Source for dynamic PPMD compressor for words which uses two
+	models - word-char, nonword-nonchar
+
+encode_number/decode_number
+	Source for dynamic PPMD compressor for numbers
+
+encode_sss/decode_sss
+	Source for SSS (start-step-stop) compressor for numbers
+
+codelength
+    Prints out the cost of encoding the input string (with respect to each model
+    that is listed in the file whose filename is specified by the -m argument).
+    See models.dat for an example.
+
+codelength1
+    Prints out the cost of encoding the input string specified by the -s
+    argument with respect to the model specified by the -m argument.
+
+probs
+    Prints out the list of probabilities for the entire alphabet at each stage
+    of the encoding of the input file. Just one model is used.
+

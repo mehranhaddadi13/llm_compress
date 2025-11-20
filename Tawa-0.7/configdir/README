@@ -1,0 +1,157 @@
+Text Mining Toolkit
+-------------------
+
+This tar distribution contains an implementation of the Text
+Modelling Toolkit ("TMT") written by Bill Teahan.
+
+
+Directories:
+-----------
+
+The distribution should contain the following directories:
+
+apps/
+	This contains a lot of sample demo applications and their source code which uses
+	the TMT.
+
+TMT/
+	This contains the source for the API (application programming interface).
+
+config/
+	This contains various files for building various files (CONFIG,
+	INSTALL, README, etc.)
+
+data/
+	This contains various text files, such as the bible in various languages.
+	These files are used in many of the demos. 
+
+	The files data/misc/chinese.txt and data/demo/segment_Chinese.txt are
+	short exerpts (100,000 words and 1,000 symbols, respectively) taken
+	(with permission) from Guo Jin's (guojin@hotmail.com) PH_corpus of segmented
+        Mandarin Chinese text kindly provided with permission from Chris Brew
+        (Chris.Brew@edinburgh.ac.uk) and Julia Hockenmaier (julia@cogsci.ed.ac.uk).
+	The full PH_corpus may be obtained from the site ftp.cogsci.ed.ac.uk.
+
+demo/
+	This contains the makefile for building the models for the demos.
+
+doc/
+	This contains documentation about TMT, including Latex source and postscript
+	for the DCC'99 paper.
+
+include/ and lib/
+	These directories are used for compiling the sources.
+
+models/
+	This contains the models built for the demos.
+
+train/
+	This contains the train program and its source for building ("training") a
+	model, given some "training" text as input.
+
+
+How do I install it?
+--------------------
+
+Look in the file INSTALL for instructions.
+
+What does it do?
+----------------
+
+Lots. Look in the file apps/Doc.1 for a list of sample applications.
+There is also quite a few demo programs which can be run. Just type "make demo"
+in each of the sample apps sub-directories. 
+
+Overview:
+---------
+A few people have asked about the API for statistical modelling I'm
+currently writing. It's still in the development stages, but I can
+give a short example to illustrate how it works.
+
+There are three main types of objects:
+
+    1) model
+         A number associated with a statistical model e.g. one model might
+         have been trained on French text, anotGher on English text etc.
+    2) symbol
+         A number associated with a symbol in the alphabet (the API
+         treats the symbols as unsigned integers; it doesn't know anything
+         about what the symbols stands for i.e. whether they are ASCII characters,
+         letters in the English alphabet, hieroglyphics, or whatever).
+    3) context
+         A number associated with the prediction context; this context is
+         is updated after each symbol has been processed, and is used to make
+         a prediction for subsequent symbols.
+
+In the API, there are routines to load a static model (from a file on disk), create
+dynamic models, create a context associated with a model, step through the
+probability distribution for predicting the next symbol given the current
+context etc.
+
+It's easier to see how this works from a short example, rather than
+laboriously describing each routine separately.  The following is an
+extract of C code that can be used to identify the language of a
+string of text.  To do this, you first need to train a whole lot of
+models using text from different languages. Then to identify the
+language, the program chooses the model which best predicts the string
+of text (i.e. has a smaller entropy).
+
+Here's the code. To a non-programmer, this may look complicated at first,
+but hopefully should become obvious once plenty of examples are provided with
+the API. (In the code below, routines that form part of the API have been prefixed by
+"TMT_" which is short for "Text Mining Toolkit"):
+
+
+float
+entropy_text (unsigned int model, char *text)
+/* Returns the entropy for predicting the text using the model. */
+{
+    unsigned int context;
+    float ent, entropy;
+    int p;
+
+    entropy = 0.0;
+    context = TMT_create_context (model);     /* creates a context associated with the
+                                                 model */
+
+    /* Now calculate the entropy for predicting each symbol in the text based on
+       the current context */
+    for (p=0; (text [p]); p++) /* for each symbol */
+    {
+        ent = TMT_entropy_symbol (context, text [p]);
+        entropy += ent;
+    }
+    TMT_release_context (context);            /* release the context for re-use */
+
+    return (entropy);
+}
+
+unsigned int
+identify_models (char *text)
+/* Returns the model number associated with the model that predicts the text best. */
+{
+    unsigned int model, min_model, models;
+    float entropy, min_ent = 0.0;
+
+    model = 1;
+    models = TMT_numberof_models (); /* returns the number of models */
+    for (model = 1; model <= models; model++)
+    {
+        entropy = entropy_text (model, text);
+        if ((min_ent == 0.0) || (entropy < min_ent))
+        {
+            min_ent = entropy;
+            min_model = model;
+        }
+    }
+    return (min_model);
+}
+
+Experiments I did for my Ph.D. thesis based on using PPM text
+compression models showed that the language could be identified using
+this approach with almost 100% accuracy (it was even able to detect
+the difference between samples of American and British English text
+with 100% accuracy by training two models on text contained in the
+Brown and LOB corpora).
+
+Bill Teahan

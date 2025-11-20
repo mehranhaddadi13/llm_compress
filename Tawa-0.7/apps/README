@@ -1,0 +1,44 @@
+This directory contains sample applications that use the API.
+
+encode/
+	This directory contains applications for
+	encoding/decoding characters and words (either dynamically or using
+        a static model), plus it contains the following two applications:
+
+	codelength
+	    Prints out the code length (-log probrarbility in bits) of the
+            input file with respect to each training model.
+
+	probs
+	    Prints out the list of probabilities for the entire
+	    alphabet at each stage of the encoding of the input file.
+	    Just one model is used.
+
+classify
+	This directory contains code for two applications:
+
+	ident_lang & ident_file
+	    similar code to the codelength application above
+            (in the encode directory), which can be used
+	    for identifying languages in text
+
+markup/
+
+        This directory contains various code for "marking up" or
+        correcting text.
+
+misc/
+	Miscellaneous programs such as loading and writing to a
+	table.
+
+stats/
+	This directory contains applications for dumping statistics
+	about the models.
+
+test/
+	Various sample test programs.
+
+train/
+        This directory contains programs and their source for building
+	("training") static and dynamic models, given some
+        "training" text as input.

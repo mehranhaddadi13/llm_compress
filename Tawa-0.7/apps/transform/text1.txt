@@ -1,0 +1,21 @@
+ The aim of this phase is segmenting text Iines of the image into sentences, words and
+ characters ( JAINQ 01) . Segmentation is an important step because extraction of
+ the characters in this stage directIy affects the accuracy of the recognition process.
+ There are two main types of segmentation: EXPLICIT and IMPLICIT.
+ The expIicit method is to determine expIicitIy segmentation points in a word by using
+ some particuIar points such as spaces or intersection points {BAHLPD 23}. The
+ expIicit method anaIyzes the page Iayout into its IogicaI parts in two steps. In the
+ impIicit method, segmentation and recognition of characters are managed sequentiaIIy
+ {REHMAN 45}. It searches the components of the image which match cIasses in its
+ aIphabet. So, aII decisions for segmentation are postponed untiI the recognition phase
+ { YSULONG 67 }. There are some probIems in this method. For exampIe, a part ofa
+ character can be divided as a segment of another character. In {BRITTOW 89};
+ some Ioss in the recognition performance is observed, caused by concurrent
+ recognition segmentation. [ jaKaZ]
+ NETLOGO : NetLogo is an environment to deveIop agent based modeI simuIations.
+ Uri WiIensky authored it in 1999 which was designed in the spirit of the Logo
+ programming Ianguage. It consists of a worId and four types of agents which are
+ turtIes,patches, Iinks and the observer . WorId is the environment of the turtIes
+ ,patches and Iinks, and it can be 2D or 3D. ( FAGSEVX)
+ abcd efghi jkImn opqrs tuvwxyz ABCD EFGHI JKLMN OPQRS TUVWXYZ
+ . , ; : [ ] ( ) { } / 0123 456 789

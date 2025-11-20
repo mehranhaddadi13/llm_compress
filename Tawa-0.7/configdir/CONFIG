@@ -1,0 +1,8 @@
+CC = gcc
+CXX = gcc
+INCLUDES = -I$(HOME)/include
+CFLAGS = -g -O -Wall -ansi -pedantic -Wlong-long $(INCLUDES)
+#CFLAGS = -g -O -Wall -ansi -pedantic -Wlong-long $(INCLUDES) -DSYSTEM_SUNOS
+CXXFLAGS = $(CFLAGS)
+LIBS = -L$(HOME)/lib -lTawa -lm
+#LIBS = -L$(HOME)/lib -lTawa -lm -lccmalloc -ldl

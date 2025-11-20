@@ -1,0 +1,54 @@
+This directory contains source for the executables "ident_lang" and "ident_file":
+
+difference
+    compares how well two models do on the same input file.
+    prints out varying length contexts and the two models' codelength
+    differences which can then be sorted later.
+
+ident_lang
+    identifies the language of the input string (with respect to each model
+    that is listed in the file whose filename is specified by the -m argument).
+    See ident_models.dat for an example.
+
+ident_file
+    identifies the language of the input file (with respect to each model
+    that is listed in the file whose filename is specified by the -m argument).
+    See ident_models.dat for an example.
+
+ident_file1
+    identifies the language of the input file (with respect to each model
+    that is listed in the file whose filename is specified by the -m argument).
+    See ident_models.dat for an example. Prints out results in
+    (codelength, filename, model-tagname) format, one per line.
+
+ident_file2
+    Analyzes a succession of files to find when there is the greatest
+    jump in entropy by computing the sum of the compressed lengths
+    of the current file using the previous file's model plus the
+    prevous file using the current file's model
+
+ident_file3
+    Same as ident_file, but only performs calculations on a single test file
+    (this is needed when using dynamic models as the model adapts to the
+    text being tested so subsequent loadings of a different file will depend
+    on which file was tested previously (not desirable)
+
+radius_file
+    Computes the information radius for a succession of files
+    based on the average distribution of two models, the positive
+    and negative models for each topic
+
+radius_file1
+    Computes the information radius for a succession of files
+    based on the average distribution between the collection
+    model and all the topic models
+
+leave_one_out
+    Classifies a set of files using a set of models plus a model
+    built from the set of files with the test file being "left out"
+
+leave_one_out1
+    Classifies a set of files using a set of models plus a model
+    built from the set of files with the test file being "left out"
+    - Uses codelength difference rather than just codelength as
+    for leave_one_out

@@ -1,0 +1,41 @@
+This directory contains the program "train" to train
+the language models from input text. It also contains
+the program "train_word" to train word-based language
+models.
+
+Usage:
+	train [options] <training-file >language-model.output
+
+	options:
+	  -E end of line forces a break (like an eof) during training
+          -N input consists of a series of positive numbers (rather than ASCII text)
+	  -S writes the model out as a static model (in so doing, saving a lot of space)
+*	  -T s  long description (title) of model=s 
+*	  -a n  size of alphabet=n
+	  -d n	debug level=n (0 default)
+*	  -o n	max order of model=n (order 5 default)
+	  -m fn load dynamic model from filename=fn
+	  -p n	progress report every n chars. (0 default i.e. never)
+
+* means required argument
+
+Examples:
+
+Trains an order 5 language model on the English bible, and writes it out as a static model:
+(Note that the size of the alphabet = 256 for 256 ASCII characters; you do not have to worry
+about what to do with eof since the API encodes a special break symbol itself which may be used
+to indicate eof has been reached.)
+
+  train <../../data/bible/english.txt >english.model -S -p 10000 -a 256 -o 5 -T "English bible, order 5 model"
+
+Trains an order 4 language model on the German bible, and writes it out as a dynamic model:
+
+  train <../../data/bible/german.txt >german.model -p 10000 -a 256 -o 4 -T "Order 4 German bible"
+
+Then adds the Latin bible to the model:
+
+  train <../../data/bible/latin.txt >german_latin.model -m german.model -p 10000 -a 256 -o 4 -T "Order 4 German & Latin bible"
+
+Then adds the English bible to the model, and writes it out as a static model:
+
+  train <../../data/bible/english.txt >three_bibles.model -S -m german_latin.model -p 10000 -a 256 -o 4 -T "Order 4 three bibles"

@@ -1,0 +1,163 @@
+""" Writes out the codelength for the input text for a list of models. """
+
+from pyTawa.TLM import *
+from pyTawa.TXT import *
+from pyTawa.TAR import *
+
+import sys, getopt
+
+def usage ():
+    print(
+        "Usage: codelength [options] <input-text",
+	"",
+	"options:",
+	"  -d n\tdebug level=n",
+	"  -c\tprint out codelengths for each character=n",
+	"  -e\tcalculate cross-entropy and not codelength",
+        "  -i\tinput filename=fn (required argument if -I not present)",
+        "  -I\tinput string=str (required argument if -i not present)",
+	"  -m fn\tlist of models filename=fn (required argument if -M not present)",
+	"  -M fn\tmodel filename=fn (required argument if -m not present)",
+	"  -r\tprint out arithmetic coding ranges",
+        sep = "\n", file=sys.stderr
+    );
+    sys.exit (2);
+
+def init_arguments (arguments):
+""" Initialises the arguments dictionary from the command line. """
+
+    opts_dict = {
+	'-c': ('Debug Chars', True),
+        '-d': ('Debug Level', 'Int'),
+	'-e': ('Calculate Cross-Entropy', True),
+        '-i': ('Input Filename', 'Str'),
+        '-I': ('Input String', 'Str'),
+        '-m': ('Models Filename', 'Str'),
+        '-M': ('Model Filename', 'Str'),
+	'-r': ('Print Coding Ranges', True),
+        '-h': ('Help', 'Exit'),
+        '--help': ('Help', 'Exit')
+    }
+
+    ok = TAR_init_arguments (arguments,
+        "cd:ehi:I:m:M:r", ["help"], opts_dict,
+        "Codelength: option not recognized")
+    if (not ok):
+        usage()
+        sys.exit(2)
+
+    if (not TAR_check_required_arguments (arguments, opts_dict,
+        [['Input Filename', 'Input String'], ['Models Filename', 'Model Filename']])):
+        usage ()
+        sys.exit(2)
+
+def codelengthText (model, text, debug_range = False, debug_chars = False):
+    """ Returns the codelength (in bits) for encoding the text using the PPM
+    model. """
+
+    context = TLM_create_context (model)
+    TLM_set_context_operation (TLM_Get_Codelength)
+
+    """
+    Insert the sentinel symbol at start of text to ensure first character
+    is encoded using a sentinel symbol context rather than an order 0
+    context.
+    """
+
+    if (debug_range):
+        print ("Coding ranges for the sentinel symbol (not included in overall total:", file=sys.stderr);
+    TLM_update_context (model, context, TXT_sentinel_symbol ())
+    if (debug_range):
+        print ("", file=sys.stderr);
+
+    codelength = 0.0
+    # Now encode each symbol
+    for p in range(TXT_length_text1 (text)):
+        symbol = TXT_getsymbol_text (text, p)
+        TLM_update_context (model, context, symbol)
+        codelen = TLM_get_codelength ()
+        if (debug_chars):
+            print ("Codelength for character", "%c" % symbol,
+                   "= %7.3f" % codelen)
+        codelength += codelen
+
+    # Now encode the sentinel symbol again to signify the end of the text
+    TLM_update_context (model, context, TXT_sentinel_symbol ())
+    codelen = TLM_get_codelength ()
+    if (debug_chars):
+        print ("Codelength for sentinel symbol =", "%.3f" % codelen,
+               file = sys.stderr)
+    codelength += codelen
+
+    TLM_release_context (model, context)
+
+    return (codelength)
+
+def codelengthModels (text, display_entropy = False,
+                      debug_range = False, debug_chars = False):
+    """ Prints out the codelength for encoding the text using the loaded
+    PPM models. """
+
+    min_codelen = 0.0
+
+    min_tag = ""
+    textlen = TXT_length_text (text)
+
+    TLM_reset_modelno ()
+    while (model := TLM_next_modelno ()):
+        tag = TLM_get_tag (model)
+        codelength = codelengthText (model, text, debug_range, debug_chars)
+        if (display_entropy):
+            codelength /= textlen
+        if ((min_codelen == 0.0) or (codelength < min_codelen)):
+            min_codelen = codelength
+            min_tag = tag
+        print ("%-24s" % tag, "%9.3f" % codelength)
+
+    if (display_entropy):
+        print ("Minimum cross-entropy for ", end = "")
+        print (min_tag, "=", "%9.3f" % codelength)
+    else:
+        print ("Minimum codelength for ", end = "")
+        print (min_tag, "=", "%9.3f" % min_codelen)
+
+def main():
+    """ Main program. """
+
+    Arguments = {}
+    init_arguments (Arguments)
+
+    if ('Input Filename' in Arguments):
+        input_filename = Arguments ['Input Filename']
+        Input_file = TXT_open_file (input_filename, b"r", b"Reading input file",
+                                    b"Codelength: can't open input file" )
+        Input_text = TXT_load_text (Input_file)
+    if ('Input String' in Arguments):
+        Input_text = TXT_write_string (Arguments ['Input String'])
+        print ("Input text=",Input_text)
+
+    if ('Models Filename' in Arguments):
+        models_filename = Arguments ['Models Filename']
+        TLM_load_models (models_filename)
+    if ('Model Filename' in Arguments):
+        model_filename = Arguments ['Model Filename']
+        model_file = TXT_open_file (model_filename, b"r", b"Reading model file",
+                                    b"Codelength: can't open model file" )
+        TLM_load_model (model_file)
+
+    if (TAR_get_argument (Arguments, 'Debug Level') > 0):
+        TLM_dump_models (Sterr_File, NULL)
+
+    if (TLM_numberof_models () < 1):
+      usage()
+
+    codelengthModels (Input_text, 'Calculate Cross-Entropy' in Arguments,
+                      'Debug Range' in Arguments,
+                      'Debug Chars' in Arguments)
+
+    TLM_release_models ()
+
+    sys.exit (0)
+
+if __name__ == '__main__':
+    main()

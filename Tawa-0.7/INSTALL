@@ -1,0 +1,27 @@
+This package is currently maintained by Bill Teahan (wjt@informatics.bangor.ac.uk)
+
+
+1. To install:
+	a. "make config"
+	b. edit CONFIG and change the compiler options to your configuration
+	c. "make"
+
+2. To build the default models use:
+	"make train"
+
+3. For a simple demo:
+	"make demo"
+
+   otherwise cd into apps/*, and "make demo" in a couple of them.
+
+4. To create a new version.
+	a. Copy everything to new home directory.
+	b. Edit Makefile and increment or change VERSION.
+	c. Type "make config".
+	d. Check CONFIG has the correct Home directory.
+
+5. If there are problems, try to fix them, then let me know.
+   :-)
+
+
+
